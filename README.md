@@ -1,4 +1,4 @@
-# Hướng Dẫn Xây Dựng Công Cụ Trợ Giúp Phân Tích Dữ Liệu (DAGPT)
+# Xây Dựng Công Cụ Trợ Giúp Phân Tích Dữ Liệu (DAGPT)
 
 - **Tổng quan:** DAGPT là một công cụ phân tích dữ liệu sử dụng các mô hình ngôn ngữ lớn để hỗ trợ các tác vụ phân tích và thao tác dữ liệu qua giao diện đàm thoại.
 - **Tính năng:**
