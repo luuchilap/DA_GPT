@@ -74,10 +74,11 @@ def main():
         st.write("### Your uploaded data: ", st.session_state.df.head())
 
         # Create data analysis agent to query with our data
+        # Replace line 77-84 with:
         da_agent = create_pandas_dataframe_agent(
             llm=llm,
             df=st.session_state.df,
-            agent_type="tool-calling",
+            agent_type="openai-functions",  # Changed from "tool-calling" to "openai-functions"
             allow_dangerous_code=True,
             verbose=True,
             return_intermediate_steps=True,
