@@ -4,6 +4,8 @@ import streamlit as st
 from dotenv import load_dotenv
 from langchain_experimental.agents.agent_toolkits.pandas.base import create_pandas_dataframe_agent
 from langchain_openai import ChatOpenAI
+from langchain.agents import Tool
+from langchain_core.tools import BaseTool  # Add this import
 
 from src.logger.base import BaseLogger
 from src.models.llms import load_llm
@@ -15,7 +17,58 @@ logger = BaseLogger()
 MODEL_NAME = "gpt-3.5-turbo"
 
 
+# Add a new PriceQueryTool
+class PriceQueryTool(BaseTool):
+    name = "price_query_tool"
+    description = "Use this tool when you need to find the price of a specific product."
+    
+    def _run(self, query: str) -> str:
+        """Query the price of a product in the dataframe"""
+        df = st.session_state.df
+        
+        # Check if price column exists
+        price_columns = [col for col in df.columns if 'price' in col.lower()]
+        if not price_columns:
+            return "No price column found in the dataset."
+        
+        price_col = price_columns[0]
+        
+        # Check if product name or ID column exists
+        product_columns = [col for col in df.columns if 'product' in col.lower() or 'name' in col.lower() or 'item' in col.lower()]
+        if not product_columns:
+            return "No product name column found in the dataset."
+        
+        product_col = product_columns[0]
+        
+        # Try to find the product in the query
+        query_lower = query.lower()
+        matching_products = df[df[product_col].str.lower().str.contains(query_lower, na=False)]
+        
+        if matching_products.empty:
+            return f"No products found matching '{query}'."
+        
+        # Format the results
+        results = []
+        for _, row in matching_products.iterrows():
+            product_name = row[product_col]
+            price = row[price_col]
+            results.append(f"{product_name}: ${price}")
+        
+        return "\n".join(results)
+
+    async def _arun(self, query: str) -> str:
+        """Async implementation of the price query tool"""
+        return self._run(query)
+
 def process_query(da_agent, query):
+
+    # Check if it's a price query
+    if "price" in query.lower() and "how much" in query.lower():
+        price_tool = PriceQueryTool()
+        result = price_tool._run(query)
+        st.write(result)
+        st.session_state.history.append((query, result))
+        return
 
     response = da_agent(query)
 
