@@ -19,8 +19,8 @@ MODEL_NAME = "gpt-3.5-turbo"
 
 # Add a new PriceQueryTool
 class PriceQueryTool(BaseTool):
-    name = "price_query_tool"
-    description = "Use this tool when you need to find the price of a specific product."
+    name: str = "price_query_tool"  # Add type annotation here
+    description: str = "Use this tool when you need to find the price of a specific product."  # Add type annotation here
     
     def _run(self, query: str) -> str:
         """Query the price of a product in the dataframe"""
@@ -55,11 +55,7 @@ class PriceQueryTool(BaseTool):
             results.append(f"{product_name}: ${price}")
         
         return "\n".join(results)
-
-    async def _arun(self, query: str) -> str:
-        """Async implementation of the price query tool"""
-        return self._run(query)
-
+    
 def process_query(da_agent, query):
 
     # Check if it's a price query
